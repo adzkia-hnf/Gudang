@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rekap Barang Gudang</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f6fb;--card:#fff;--tx:#1b2333;--mut:#6b7587;--line:#e3e8f1;--pri:#2f6bff;--pri2:#e8efff;--ok:#10a36b;--bad:#e5484d;--sh:0 2px 10px rgba(30,50,100,.08);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1420;--card:#192032;--tx:#e8ecf5;--mut:#98a2b8;--line:#2a3350;--pri:#5b8cff;--pri2:#212c4d;--ok:#32c48d;--bad:#ff6b70;--sh:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1420;--card:#192032;--tx:#e8ecf5;--mut:#98a2b8;--line:#2a3350;--pri:#5b8cff;--pri2:#212c4d;--ok:#32c48d;--bad:#ff6b70;--sh:none;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--pri);color:#fff;display:grid;place-items:center;font-size:22px}
+h1{font-size:20px;margin:0}header p{margin:0;color:var(--mut);font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto;background:var(--card);padding:6px;border-radius:14px;box-shadow:var(--sh);margin-bottom:16px}
+nav button{flex:1;white-space:nowrap;border:0;background:none;color:var(--mut);padding:10px 14px;border-radius:10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+nav button.on{background:var(--pri);color:#fff}
+.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sh);margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:4px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+input:focus,select:focus{outline:2px solid var(--pri);border-color:transparent}
+.btn{border:0;background:var(--pri);color:#fff;padding:11px 18px;border-radius:10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.btn.sec{background:var(--pri2);color:var(--pri)}.btn.del{background:none;color:var(--bad);padding:4px 8px}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.row>*{flex:1}.row .btn{flex:0 0 auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--sh)}
+.stat b{display:block;font-size:24px;color:var(--pri)}.stat span{font-size:12px;color:var(--mut)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--mut);text-transform:uppercase}
+td.n,th.n{text-align:right}.empty{color:var(--mut);text-align:center;padding:22px}
+.chip{display:inline-block;background:var(--pri2);color:var(--pri);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:30px;font-weight:600;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+.names{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.names span{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:13px}
+.names span i{color:var(--bad);font-style:normal;cursor:pointer;margin-left:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;max-height:230px;overflow-y:auto;margin-top:8px;padding:2px}
+.pick{border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:10px;padding:9px 13px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.pick.on{background:var(--pri);color:#fff;border-color:var(--pri)}.pick.add{border-style:dashed;color:var(--pri)}
+.stp{display:flex;gap:6px}.ai{width:84px;padding:8px;text-align:center}
+.seg{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:12px}.seg button{flex:1;border:0;border-radius:9px;padding:11px;background:none;color:var(--mut);font:700 14px inherit;font-family:inherit;cursor:pointer}.seg button.on{background:var(--ok);color:#fff}.seg button.on.k{background:var(--bad)}.chip.out{background:rgba(229,72,77,.15);color:var(--bad)}.stp input{text-align:center;font-weight:700}
+.stp button{flex:0 0 46px;border:0;border-radius:10px;background:var(--pri2);color:var(--pri);font-size:22px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">📦</div><div><h1>Rekap Barang Gudang</h1><p>Catat dus &amp; dokumen, rekap harian, mingguan, bulanan</p></div></header>
+<nav id="nav"></nav>
+<main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const BASE="Abadi Niaga|ABC|ACE|Acmic|Acosta|Adiwarna|AFA|Ahbab|Akasha|Amanda|Ampuh|AMS|Andalan|APL|Arira|Arkstarindo|Aroma Prima|Artadwi|Aspar|Astaguna|Ayana|Bahagia|Belintang|Berill|Bestari|Bintang Indo|Biskies|BMM|BNN|Borwita|BSP|BTJ|Buana Mandiri|Bukit Inti|Bukit Perak|Bulog|Bunny|Buyung Poetra|CDU|Cendana|Central|CSW|Dairy Food|Dempo|Detol|Dinamis|Distribusi|DK|DMA|Dunia Boga|East Indo|Emway|Enseval|Faber Castell|FB|Ferinatex|FFI|Fokus Ritel|Goday|Gonusa|Gudeg|Harapan Mandiri|Hardi Salim|Harvest|Hasta Lestari|Heraldi|Himalaya|Homeco|IB|IDM|Jakarana|Jamindo|Japfa Food|Java Indo|Jaza Venus|Lestari|Lidya|Liway|Macro|Marganus|Masuya|Mekar Wangi|Menjangan|MM,CV|MMP|MMU|MNN|Mondelez|MPP|MSP|Mulia Raya|Nestle|Niaga Abadi|Nusantara U Jaya|Otsuka|PCI|PDU|Penta Valent|Pepsico|PHK|PMA|Poly Usaha|PPG|Promax|PSL|PSLove|Pusan|Ricky Arta|Royal Pesona|S,Makmur|SAI|Samara|Saritama|Sariwangi|SD|SDI|Sewu|SGG|Sinarmas|Sindang Asih|Sinergi Cipta|SMA|SMU|SNS|Sosro|Stanly|Sukanda|Supera|Surya Abadi|Surya Pangan|Surya Pelangi|Suryamas|Tata Nasional|TSM|Tempo|Tiga Raksa|Titian|UC|UJ|Ulam Tiba|Usaha Bersama|Varia|Velyn|Visiragam|Viva Teknik|Wicaksana|Wikarta".split("|");
+const K="rekapGudangV1";
+let S={names:[...BASE],entries:[]};
+try{const r=localStorage.getItem(K);if(r){const p=JSON.parse(r);if(p&&p.names&&p.entries)S=p}}catch(e){}
+S.awal=S.awal||{};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const iso=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today=()=>iso(new Date());
+const BLN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const fmt=s=>{const[y,m,d]=s.split("-");return `${+d} ${BLN[m-1].slice(0,3)} ${y}`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let tab="input",rd=today(),rm=new Date().getMonth(),ry=new Date().getFullYear();
+const TABS=[["input","➕ Input"],["harian","Harian"],["mingguan","Mingguan"],["bulanan","Bulanan"],["stok","Total Stok"],["nama","Nama Barang"]];
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}
+function weekRange(s){const d=new Date(s+"T00:00:00");const k=(d.getDay()+6)%7;const a=new Date(d);a.setDate(d.getDate()-k);const b=new Date(a);b.setDate(a.getDate()+6);return[iso(a),iso(b)]}
+function range(){
+ if(tab==="harian")return[rd,rd];
+ if(tab==="mingguan")return weekRange(rd);
+ const m=String(rm+1).padStart(2,"0"),last=new Date(ry,rm+1,0).getDate();return[`${ry}-${m}-01`,`${ry}-${m}-${last}`]}
+function nav(){$("#nav").innerHTML=TABS.map(([k,l])=>`<button class="${k===tab?"on":""}" onclick="go('${k}')">${l}</button>`).join("")}
+function go(t){tab=t;render()}
+function addEntry(){
+ const n=$("#fn").value.trim(),dus=+$("#fd").value||0,dok=+$("#fk").value||0,date=$("#ft").value||today();
+ if(!n)return toast("Pilih nama barang dulu");
+ if(dus<=0&&dok<=0)return toast("Isi jumlah dus atau dokumen");
+ const ex=S.names.find(x=>x.toLowerCase()===n.toLowerCase());
+ let name=ex;
+ if(!ex){if(!confirm(`"${n}" belum ada di daftar. Tambahkan sebagai nama barang baru?`))return;S.names.push(n);name=n}
+ if(jenis==="keluar"){const a=S.awal[name]||{dus:0,dok:0};let nd=a.dus,nk=a.dok;S.entries.forEach(e=>{if(e.name===name){const s=e.j==="keluar"?-1:1;nd+=s*e.dus;nk+=s*e.dok}});if((dus>nd||dok>nk)&&!confirm(`Stok ${name} saat ini ${nd} dus / ${nk} dokumen. Barang keluar melebihi stok, tetap simpan?`))return}
+ S.entries.push({id:Date.now()+Math.random(),date,name,dus,dok,j:jenis,note:$("#fc").value.trim()});
+ save();toast("Tersimpan ✓");rd=date;render();setTimeout(()=>{const e=$("#fn");e&&e.focus()},50)}
+function delEntry(id){if(confirm("Hapus catatan ini?")){S.entries=S.entries.filter(e=>e.id!==id);save();render()}}
+function addName(){const v=$("#nn").value.trim();if(!v)return;
+ if(S.names.some(x=>x.toLowerCase()===v.toLowerCase()))return toast("Nama sudah ada");
+ S.names.push(v);save();render();toast("Nama ditambahkan ✓")}
+function delName(n){const used=S.entries.some(e=>e.name===n);
+ if(confirm(used?`"${n}" sudah punya catatan. Hapus dari daftar saja (catatan tetap ada)?`:`Hapus "${n}"?`)){S.names=S.names.filter(x=>x!==n);save();render()}}
+function entryRows(list,del){return list.length?list.map(e=>`<tr><td>${fmt(e.date)}</td><td>${e.j==="keluar"?'<span class="chip out">Keluar</span>':'<span class="chip">Masuk</span>'}</td><td><b>${esc(e.name)}</b>${e.note?`<br><small style="color:var(--mut)">${esc(e.note)}</small>`:""}</td><td class="n">${e.dus}</td><td class="n">${e.dok}</td><td>${del?`<button class="btn del" onclick="delEntry(${e.id})">Hapus</button>`:""}</td></tr>`).join(""):`<tr><td colspan="6" class="empty">Belum ada data</td></tr>`}
+const head=`<thead><tr><th>Tanggal</th><th>Jenis</th><th>Barang</th><th class="n">Dus</th><th class="n">Dokumen</th><th></th></tr></thead>`;
+function render(){
+ nav();const m=$("#main");
+ if(tab==="input"){
+  const t=S.entries.filter(e=>e.date===today()).reverse();
+  m.innerHTML=`<div class="card"><h2>Catat Barang</h2>
+  <div class="grid">
+  <div style="grid-column:1/-1"><div class="seg"><button type="button" id="jm" class="${jenis==="masuk"?"on":""}" onclick="setJ('masuk')">⬇ Barang Masuk</button><button type="button" id="jk" class="k ${jenis==="keluar"?"on":""}" onclick="setJ('keluar')">⬆ Barang Keluar</button></div></div><div><label>Tanggal</label><input type="date" id="ft" value="${today()}"></div>
+  <div style="grid-column:1/-1"><label>Nama Barang / Supplier: <b id="sel" style="color:var(--pri)"></b></label><input type="hidden" id="fn"><input id="fs" placeholder="Cari nama (opsional), lalu tap untuk memilih" autocomplete="off" oninput="chips()"><div class="chips" id="chips"></div></div>
+  <div><label>Jumlah Dus</label><div class="stp"><button type="button" onclick="step('fd',-1)">−</button><input type="number" id="fd" min="0" value="1" inputmode="numeric"><button type="button" onclick="step('fd',1)">+</button></div></div>
+  <div><label>Jumlah Dokumen</label><div class="stp"><button type="button" onclick="step('fk',-1)">−</button><input type="number" id="fk" min="0" value="1" inputmode="numeric"><button type="button" onclick="step('fk',1)">+</button></div></div>
+  <div style="grid-column:1/-1"><label>Keterangan (opsional)</label><input id="fc" placeholder="Contoh: 1 dus berisi 3 dokumen"></div></div>
+  <datalist id="dl">${[...S.names].sort((a,b)=>a.localeCompare(b)).map(n=>`<option value="${esc(n)}">`).join("")}</datalist>
+  <p style="margin:12px 0 0"><button class="btn" id="sv" onclick="addEntry()">${jenis==="masuk"?"Simpan Barang Masuk":"Simpan Barang Keluar"}</button></p>
+  <p style="color:var(--mut);font-size:12px;margin:10px 0 0">Satu dus bisa berisi lebih dari satu dokumen, jadi isi jumlah dus dan dokumen secara terpisah.</p></div>
+  <div class="card"><h2>Catatan Hari Ini <span class="chip">${t.length}</span></h2><div class="tw"><table>${head}<tbody>${entryRows(t,true)}</tbody></table></div></div>`;
+  sel="";chips();return}
+ if(tab==="stok"){stokView();return}
+ if(tab==="nama"){
+  m.innerHTML=`<div class="card"><h2>Kelola Nama Barang <span class="chip">${S.names.length}</span></h2>
+  <div class="row"><div><label>Tambah nama baru</label><input id="nn" placeholder="Nama barang"></div><button class="btn" onclick="addName()">Tambah</button></div>
+  <input id="sq" placeholder="Cari nama..." style="margin-top:12px" oninput="filt()">
+  <div class="names" id="nl"></div></div>`;
+  $("#nn").addEventListener("keydown",e=>{if(e.key==="Enter")addName()});filt();return}
+ // rekap
+ const[a,b]=range();
+ const list=S.entries.filter(e=>e.date>=a&&e.date<=b).sort((x,y)=>x.date<y.date?1:-1);
+ const g={};list.forEach(e=>{const o=g[e.name]||(g[e.name]={dus:0,dok:0,kd:0,kk:0,n:0});if(e.j==="keluar"){o.kd+=e.dus;o.kk+=e.dok}else{o.dus+=e.dus;o.dok+=e.dok}o.n++});
+ const rows=Object.entries(g).sort((x,y)=>y[1].dus-x[1].dus);
+ const M=list.filter(e=>e.j!=="keluar"),X=list.filter(e=>e.j==="keluar");const td=M.reduce((s,e)=>s+e.dus,0),tk=M.reduce((s,e)=>s+e.dok,0),xd=X.reduce((s,e)=>s+e.dus,0),xk=X.reduce((s,e)=>s+e.dok,0);
+ let ctl;
+ if(tab==="bulanan")ctl=`<div class="row"><div><label>Bulan</label><select onchange="rm=+this.value;render()">${BLN.map((x,i)=>`<option value="${i}" ${i===rm?"selected":""}>${x}</option>`).join("")}</select></div><div><label>Tahun</label><input type="number" value="${ry}" onchange="ry=+this.value||ry;render()"></div></div>`;
+ else ctl=`<div class="row"><div><label>${tab==="harian"?"Pilih tanggal":"Pilih tanggal dalam minggu"}</label><input type="date" value="${rd}" onchange="rd=this.value||today();render()"></div></div>`;
+ const per=a===b?fmt(a):`${fmt(a)} – ${fmt(b)}`;
+ m.innerHTML=`<div class="card"><h2>Rekap ${tab[0].toUpperCase()+tab.slice(1)}</h2>${ctl}<p style="margin:10px 0 0;color:var(--mut)">Periode: <b style="color:var(--tx)">${per}</b></p></div>
+ <div class="stats"><div class="stat"><b>${td}</b><span>Dus Masuk</span></div><div class="stat"><b>${tk}</b><span>Dokumen Masuk</span></div><div class="stat"><b style="color:var(--bad)">${xd}</b><span>Dus Keluar</span></div><div class="stat"><b style="color:var(--bad)">${xk}</b><span>Dokumen Keluar</span></div><div class="stat"><b>${rows.length}</b><span>Jenis Barang</span></div><div class="stat"><b>${list.length}</b><span>Catatan</span></div></div>
+ <div class="card"><h2>Ringkasan per Barang</h2><div class="tw"><table><thead><tr><th>Barang</th><th class="n">Masuk Dus</th><th class="n">Masuk Dok</th><th class="n">Keluar Dus</th><th class="n">Keluar Dok</th></tr></thead><tbody>${rows.length?rows.map(([n,o])=>`<tr><td><b>${esc(n)}</b></td><td class="n">${o.dus}</td><td class="n">${o.dok}</td><td class="n">${o.kd}</td><td class="n">${o.kk}</td></tr>`).join("")+`<tr><td><b>Total</b></td><td class="n"><b>${td}</b></td><td class="n"><b>${tk}</b></td><td class="n"><b>${xd}</b></td><td class="n"><b>${xk}</b></td></tr>`:`<tr><td colspan="5" class="empty">Belum ada data pada periode ini</td></tr>`}</tbody></table></div>
+ <p style="margin:12px 0 0"><button class="btn sec" onclick="csv()">⬇ Unduh CSV</button></p></div>
+ <div class="card"><h2>Detail Catatan</h2><div class="tw"><table>${head}<tbody>${entryRows(list,true)}</tbody></table></div></div>`}
+let CT={};
+function stokView(){
+ $("#main").innerHTML=`<div class="stats"><div class="stat"><b id="s1">0</b><span>Total Dus Keseluruhan</span></div><div class="stat"><b id="s2">0</b><span>Total Dokumen Keseluruhan</span></div><div class="stat"><b id="s3">0</b><span>Stok Awal (Dus)</span></div><div class="stat"><b id="s4">0</b><span>Stok Awal (Dokumen)</span></div></div>
+ <div class="card"><h2>Total Stok per Supplier</h2><p style="margin:0 0 12px;color:var(--mut);font-size:13px">Isi kolom Stok Awal untuk barang yang sudah ada di gudang sebelum mulai mencatat. Total = Stok Awal + barang masuk − barang keluar. Perubahan tersimpan otomatis.</p>
+ <input id="ss" placeholder="Cari supplier..." oninput="stokRows()" style="margin-bottom:10px"><div class="tw"><table><thead><tr><th>Supplier</th><th>Awal Dus</th><th>Awal Dok</th><th class="n">Masuk-Keluar Dus</th><th class="n">Masuk-Keluar Dok</th><th class="n">Total Dus</th><th class="n">Total Dok</th></tr></thead><tbody id="sb"></tbody></table></div></div>`;
+ stokRows()}
+function stokRows(){
+ CT={};S.entries.forEach(e=>{const o=CT[e.name]||(CT[e.name]={dus:0,dok:0}),s=e.j==="keluar"?-1:1;o.dus+=s*e.dus;o.dok+=s*e.dok});
+ const q=$("#ss").value.toLowerCase();
+ const all=[...new Set([...S.names,...Object.keys(CT)])].sort((a,b)=>a.localeCompare(b));
+ $("#sb").innerHTML=all.filter(n=>n.toLowerCase().includes(q)).map(n=>{const a=S.awal[n]||{dus:0,dok:0},c=CT[n]||{dus:0,dok:0};
+  return `<tr data-n="${esc(n)}"><td><b>${esc(n)}</b></td><td><input class="ai" type="number" min="0" inputmode="numeric" data-k="dus" placeholder="0" value="${a.dus||""}"></td><td><input class="ai" type="number" min="0" inputmode="numeric" data-k="dok" placeholder="0" value="${a.dok||""}"></td><td class="n">${c.dus}</td><td class="n">${c.dok}</td><td class="n td"><b>${a.dus+c.dus}</b></td><td class="n tk"><b>${a.dok+c.dok}</b></td></tr>`}).join("")||`<tr><td colspan="7" class="empty">Tidak ditemukan</td></tr>`;
+ document.querySelectorAll("#sb .ai").forEach(i=>i.oninput=()=>{
+  const tr=i.closest("tr"),n=tr.dataset.n,o=S.awal[n]||(S.awal[n]={dus:0,dok:0});
+  o[i.dataset.k]=Math.max(0,+i.value||0);save();
+  const c=CT[n]||{dus:0,dok:0};tr.querySelector(".td b").textContent=o.dus+c.dus;tr.querySelector(".tk b").textContent=o.dok+c.dok;stokStats()});
+ stokStats()}
+function stokStats(){
+ let ad=0,ak=0,cd=0,ck=0;Object.values(S.awal).forEach(a=>{ad+=a.dus||0;ak+=a.dok||0});Object.values(CT).forEach(c=>{cd+=c.dus;ck+=c.dok});
+ $("#s1").textContent=ad+cd;$("#s2").textContent=ak+ck;$("#s3").textContent=ad;$("#s4").textContent=ak}
+let jenis="masuk";
+function setJ(j){jenis=j;$("#jm").classList.toggle("on",j==="masuk");$("#jk").classList.toggle("on",j==="keluar");$("#sv").textContent=j==="masuk"?"Simpan Barang Masuk":"Simpan Barang Keluar"}
+let sel="";
+function step(id,d){const e=$("#"+id);e.value=Math.max(0,(+e.value||0)+d)}
+function pick(n){sel=n;$("#fn").value=n;chips()}
+function chips(){
+ const raw=$("#fs").value.trim(),q=raw.toLowerCase();
+ const all=[...S.names].sort((a,b)=>a.localeCompare(b));
+ const l=all.filter(n=>n.toLowerCase().includes(q));
+ $("#sel").textContent=sel||"belum dipilih";
+ $("#chips").innerHTML=l.map(n=>`<button type="button" class="pick ${n===sel?"on":""}" data-n="${esc(n)}">${esc(n)}</button>`).join("")+(q&&!all.some(n=>n.toLowerCase()===q)?`<button type="button" class="pick add" data-add="1">+ Tambah &quot;${esc(raw)}&quot;</button>`:"");
+ document.querySelectorAll("#chips .pick").forEach(b=>b.onclick=()=>{
+  if(b.dataset.add){S.names.push(raw);save();$("#fs").value="";pick(raw);toast("Nama baru ditambahkan ✓")}else pick(b.dataset.n)})}
+function filt(){const q=($("#sq")?$("#sq").value:"").toLowerCase();
+ $("#nl").innerHTML=[...S.names].sort((a,b)=>a.localeCompare(b)).filter(n=>n.toLowerCase().includes(q)).map(n=>`<span>${esc(n)}<i data-n="${esc(n)}">✕</i></span>`).join("");
+ document.querySelectorAll("#nl i").forEach(i=>i.onclick=()=>delName(i.dataset.n))}
+function csv(){const[a,b]=range();
+ const l=S.entries.filter(e=>e.date>=a&&e.date<=b).sort((x,y)=>x.date<y.date?-1:1);
+ const q=v=>`"${String(v).replace(/"/g,'""')}"`;
+ const t=["Tanggal,Jenis,Barang,Dus,Dokumen,Keterangan",...l.map(e=>[e.date,e.j==="keluar"?"Keluar":"Masuk",q(e.name),e.dus,e.dok,q(e.note||"")].join(","))].join("\n");
+ const u=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));
+ const x=document.createElement("a");x.href=u;x.download=`rekap-${tab}-${a}.csv`;x.click();URL.revokeObjectURL(u)}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&tab==="input"&&e.target.tagName==="INPUT"&&e.target.id!=="fc"&&e.target.id!=="fs"&&e.target.type!=="date"){e.preventDefault();addEntry()}});
+render();
+</script>
+</body>
+</html>
